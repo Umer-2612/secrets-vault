@@ -25,26 +25,34 @@ brew install age direnv
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc   # once, if you haven't already
 # open a new terminal, or: source ~/.zshrc
 
-git clone git@github.com:Umer-2612/secrets-vault.git
+git clone https://github.com/Umer-2612/secrets-vault.git
 cd secrets-vault
 ./setup.sh
 ```
+
+(HTTPS, not SSH, this repo is public and needs no authentication to clone at all.)
 
 Enter the passphrase when asked. That's it, every service repo you already have cloned (or
 clone from now on) will pick up its variables automatically via its own `.envrc`.
 
 ## Updating a secret
 
-1. Pull the latest vault: `git pull`
-2. Decrypt it: `age -d -o vault.env vault.env.age`
-3. Edit `vault.env`, change whatever needs changing
-4. Re-encrypt: `age -p -o vault.env.age vault.env` (choose the same shared passphrase again)
-5. **Delete the plaintext file**: `rm vault.env`
-6. Commit and push: `git add vault.env.age && git commit -m "..." && git push`
-7. Tell everyone to `git pull && ./setup.sh` in this repo to pick up the change
+```bash
+git pull
+./edit.sh
+```
 
-`vault.env` is gitignored, but that only protects against committing it by accident, always
-delete it yourself once you're done editing.
+`edit.sh` decrypts the vault, opens it in `$EDITOR`, re-encrypts on save, and deletes the
+plaintext copy automatically, even if you cancel partway through. Then:
+
+```bash
+git add vault.env.age && git commit -m "..." && git push
+```
+
+Tell everyone to run `cd ~/.secrets-vault && git pull && ./setup.sh` to pick up the change.
+
+Never keep the decrypted `vault.env` around after editing, it's every secret in plain text
+sitting next to the encrypted copy, `edit.sh` handles removing it for you automatically.
 
 ## Adding a new variable or service
 
