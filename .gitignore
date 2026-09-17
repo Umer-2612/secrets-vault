@@ -1,2 +1,4 @@
-vault.env
+vault.env*
+!vault.env.template
+!vault.env.age
 .DS_Store
